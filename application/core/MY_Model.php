@@ -15,6 +15,10 @@ interface Active_record {
 //  Utility methods
 //---------------------------------------------------------------------------
 
+	function getData($filename);
+	
+	function getDataForName($filename, $stockname);
+    
     /**
      * Return the number of records in this table.
      * @return int The number of records in this table
@@ -104,6 +108,7 @@ interface Active_record {
      * @return mixed The selected records, as an array of records
      */
     function some($what, $which);
+    
 }
 
 /**
@@ -138,6 +143,45 @@ class MY_Model extends CI_Model implements Active_Record {
         $this->_keyField = $keyfield;
     }
 
+   
+    function getData($filename)
+	{
+		$delimiter = ",";
+		
+	
+		$header = NULL;
+		$data = array();
+		if (($handle = fopen($filename, 'r')) !== FALSE)
+		{
+			while (($row = fgetcsv($handle, 1000, $delimiter)) !== FALSE)
+			{
+				if(!$header)
+					$header = $row;
+				else
+					$data[] = array_combine($header, $row);
+			}
+			fclose($handle);
+		}
+		return $data;
+	}
+	
+	function getDataForName($filename, $stockname)
+	{
+		$getAll = $this->getData($filename);
+		
+		 $result = array();
+        // loop through array
+        foreach ($getAll as $row)
+        {
+            // search array for code that matches stock id and put into result array
+            if ($row["code"] == $stockname)
+            {
+                $result[] = $row;
+            }
+        }
+        return $result;
+	}
+    
 //---------------------------------------------------------------------------
 //  Utility methods
 //---------------------------------------------------------------------------
@@ -262,6 +306,9 @@ class MY_Model extends CI_Model implements Active_Record {
         else
             return null;
     }
+    
+    
+
 
 }
 
@@ -363,7 +410,7 @@ class MY_Model2 extends MY_Model {
         $query = $this->db->get($this->_tableName);
         return $query->result();
     }
-
+    
 }
 
 /* End of file */

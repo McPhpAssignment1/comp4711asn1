@@ -30,7 +30,6 @@ class Moves extends MY_Model
         foreach ($this->Moves->recent() as $row)
             {
                 return $row->Code;
-            }
-            
+            }   
     }
 }
